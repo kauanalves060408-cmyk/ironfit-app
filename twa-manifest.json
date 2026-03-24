@@ -1,0 +1,48 @@
+{
+  "packageId": "com.ironfit.app",
+  "host": "SEU-DOMINIO.netlify.app",
+  "name": "IRONFIT — Seu Personal Digital",
+  "launcherName": "IRONFIT",
+  "display": "standalone",
+  "themeColor": "#09090f",
+  "themeColorDark": "#09090f",
+  "navigationColor": "#09090f",
+  "navigationColorDark": "#09090f",
+  "navigationDividerColor": "#252533",
+  "navigationDividerColorDark": "#252533",
+  "backgroundColor": "#09090f",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://SEU-DOMINIO.netlify.app/icons/icon-512x512.png",
+  "maskableIconUrl": "https://SEU-DOMINIO.netlify.app/icons/icon-512x512.png",
+  "monochromeIconUrl": "https://SEU-DOMINIO.netlify.app/icons/icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./ironfit.keystore",
+    "alias": "ironfit"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [
+    {
+      "name": "Meu Treino",
+      "shortName": "Treino",
+      "url": "/?page=treino",
+      "icons": [{ "src": "https://SEU-DOMINIO.netlify.app/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://SEU-DOMINIO.netlify.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": { "enabled": false },
+    "playBilling": { "enabled": false }
+  },
+  "alphaDependencies": { "enabled": false },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://SEU-DOMINIO.netlify.app/",
+  "minSdkVersion": 19,
+  "orientation": "portrait"
+}

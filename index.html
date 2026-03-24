@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IRONFIT — Seu Personal Digital</title>
+
+<!-- ═══ PWA META TAGS ═══ -->
+<meta name="application-name" content="IRONFIT">
+<meta name="description" content="Seu personal trainer digital. Treinos, nutrição e progresso no seu bolso.">
+<meta name="theme-color" content="#09090f">
+<meta name="background-color" content="#09090f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IRONFIT">
+<meta name="msapplication-TileColor" content="#09090f">
+<meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+
+<!-- ═══ OPEN GRAPH (compartilhamento) ═══ -->
+<meta property="og:title" content="IRONFIT — Seu Personal Digital">
+<meta property="og:description" content="Treinos, nutrição e progresso. Grátis.">
+<meta property="og:image" content="icons/feature-graphic-1024x500.png">
+<meta property="og:type" content="website">
+
+<!-- ═══ MANIFEST ═══ -->
+<link rel="manifest" href="manifest.json">
+
+<!-- ═══ APPLE TOUCH ICONS ═══ -->
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+
+<!-- Apple Splash Screens -->
+<link rel="apple-touch-startup-image" href="icons/splash-2048x2048.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-72x72.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #09090f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #252533;
+    --accent: #e8ff47;
+    --accent2: #ff4757;
+    --accent3: #47c6ff;
+    --purple: #b066ff;
+    --text: #eeeef5;
+    --muted: #5c5c72;
+    --card: #141420;
+  }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  /* SPLASH */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.6s ease;
+  }
+  #splash.out { opacity: 0; pointer-events: none; }
+  .splash-logo {
+    font-family: 'Bebas Neue'; font-size: clamp(72px,18vw,120px);
+    letter-spacing: 12px; color: var(--accent);
+    filter: drop-shadow(0 0 50px rgba(232,255,71,0.35));
+    animation: pulse-logo 2s ease-in-out infinite;
+  }
+  @keyframes pulse-logo {
+    0%,100%{ filter: drop-shadow(0 0 50px rgba(232,255,71,0.35)); }
+    50%{ filter: drop-shadow(0 0 80px rgba(232,255,71,0.6)); }
+  }
+  .splash-sub { font-size:12px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:8px; }
+  .splash-bar { width:180px; height:2px; background:var(--border); border-radius:99px; margin-top:36px; overflow:hidden; }
+  .splash-fill { height:100%; background:var(--accent); border-radius:99px; animation: fill-bar 1.8s ease forwards 0.3s; width:0; }
+  @keyframes fill-bar { to { width:100%; } }
+
+  /* INSTALL BANNER */
+  #install-banner {
+    position: fixed; bottom: 90px; left: 12px; right: 12px; z-index: 800;
+    background: var(--surface);
+    border: 1px solid rgba(232,255,71,0.4);
+    border-radius: 16px; padding: 16px;
+    display: none;
+    align-items: center; gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  #install-banner.show { display: flex; }
+  @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .install-icon { font-size:32px; flex-shrink:0; }
+  .install-text { flex:1; }
+  .install-title { font-size:14px; font-weight:600; }
+  .install-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .install-btns { display:flex; gap:8px; flex-shrink:0; }
+  .install-btn {
+    padding:8px 14px; border-radius:8px; border:none;
+    font-family:'Bebas Neue'; font-size:15px; letter-spacing:1.5px; cursor:pointer;
+  }
+  .install-btn.yes { background:var(--accent); color:var(--bg); }
+  .install-btn.no { background:var(--surface2); color:var(--muted); }
+
+  /* OFFLINE BANNER */
+  #offline-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 700;
+    background: var(--accent2); color: white;
+    padding: 10px 16px; font-size: 13px; font-weight: 600;
+    text-align: center; display: none;
+  }
+  #offline-banner.show { display: block; }
+
+  /* UPDATE BANNER */
+  #update-banner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 700;
+    background: var(--accent); color: var(--bg);
+    padding: 12px 16px; font-size: 13px; font-weight: 600;
+    display: none; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  #update-banner.show { display: flex; }
+  .update-btn { padding:6px 14px; background:var(--bg); color:var(--accent); border:none; border-radius:6px; font-weight:700; cursor:pointer; font-size:12px; }
+
+  /* AUTH SCREEN */
+  #auth-screen {
+    display: none; min-height: 100vh; min-height: -webkit-fill-available;
+    position: relative; overflow: hidden;
+  }
+  #auth-screen.active { display: flex; flex-direction: column; }
+  .auth-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse at 20% 20%, rgba(232,255,71,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(71,198,255,0.04) 0%, transparent 50%);
+  }
+  .auth-grid {
+    position: absolute; inset: 0; z-index: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px; opacity: 0.3;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  .auth-wrap {
+    position: relative; z-index: 1; flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px 20px;
+  }
+  .auth-logo { font-family:'Bebas Neue'; font-size:52px; letter-spacing:8px; color:var(--accent); margin-bottom:4px; filter:drop-shadow(0 0 20px rgba(232,255,71,0.3)); }
+  .auth-tagline { font-size:12px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:36px; }
+  .auth-tabs { display:flex; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:24px; width:100%; max-width:360px; }
+  .auth-tab { flex:1; padding:10px; border:none; background:transparent; color:var(--muted); font-family:'Bebas Neue'; font-size:17px; letter-spacing:2px; cursor:pointer; border-radius:8px; transition:all 0.2s; }
+  .auth-tab.active { background:var(--accent); color:var(--bg); }
+  .auth-form { width:100%; max-width:360px; display:flex; flex-direction:column; gap:14px; }
+  .auth-field { display:flex; flex-direction:column; gap:6px; }
+  .auth-label { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .auth-input { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; color:var(--text); font-size:15px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s,box-shadow 0.2s; width:100%; }
+  .auth-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(232,255,71,0.08); }
+  .auth-error { background:rgba(255,71,87,0.1); border:1px solid rgba(255,71,87,0.3); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--accent2); display:none; animation:shake 0.3s ease; }
+  .auth-error.show { display:block; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
+  .btn-auth { width:100%; padding:16px; background:var(--accent); color:var(--bg); border:none; border-radius:12px; font-family:'Bebas Neue'; font-size:22px; letter-spacing:3px; cursor:pointer; transition:all 0.2s; margin-top:4px; }
+  .btn-auth:active { transform:scale(0.97); }
+  .auth-register-extras { display:none; flex-direction:column; gap:14px; }
+  .auth-register-extras.show { display:flex; }
+  .select-field { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; color:var(--text); font-size:15px; font-family:'DM Sans',sans-serif; outline:none; cursor:pointer; width:100%; appearance:none; }
+
+  /* APP SHELL */
+  #app { display:none; flex-direction:column; min-height:100vh; min-height:-webkit-fill-available; }
+  #app.active { display:flex; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:16px 18px 0; flex-shrink:0; }
+  .topbar-logo { font-family:'Bebas Neue'; font-size:26px; letter-spacing:4px; color:var(--accent); }
+  .topbar-user { display:flex; align-items:center; gap:10px; }
+  .topbar-names { text-align:right; }
+  .topbar-name { font-size:13px; font-weight:600; }
+  .topbar-lvl { font-size:11px; color:var(--accent); }
+  .avatar { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue'; font-size:18px; color:var(--bg); font-weight:700; flex-shrink:0; border:2px solid rgba(232,255,71,0.3); }
+  .logout-btn { background:none; border:1px solid var(--border); border-radius:8px; padding:6px 10px; color:var(--muted); font-size:11px; cursor:pointer; transition:all 0.2s; letter-spacing:1px; text-transform:uppercase; }
+  .logout-btn:hover { border-color:var(--accent2); color:var(--accent2); }
+
+  /* PAGES */
+  .page { display:none; flex:1; padding:14px 16px 90px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .page.active { display:block; animation:fadeUp 0.25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position:fixed; bottom:0; left:0; right:0;
+    background:rgba(17,17,24,0.96); backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);
+    display:flex; z-index:100;
+    padding:6px 0;
+    padding-bottom: max(env(safe-area-inset-bottom), 8px);
+  }
+  .nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; background:none; border:none; cursor:pointer; color:var(--muted); font-size:10px; letter-spacing:0.5px; text-transform:uppercase; font-weight:600; transition:color 0.2s; -webkit-tap-highlight-color:transparent; }
+  .nav-btn.active { color:var(--accent); }
+  .nav-btn svg { width:21px; height:21px; stroke-width:1.8; }
+  .nav-btn.active svg { filter:drop-shadow(0 0 5px var(--accent)); }
+
+  /* CARDS & COMPONENTS */
+  .sec-title { font-family:'Bebas Neue'; font-size:28px; letter-spacing:2px; margin-bottom:2px; }
+  .sec-sub { font-size:13px; color:var(--muted); margin-bottom:18px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:14px; }
+  .card-title { font-size:14px; font-weight:600; margin-bottom:12px; }
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .stat-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; position:relative; overflow:hidden; }
+  .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+  .stat-card.c1::before{background:var(--accent)} .stat-card.c2::before{background:var(--accent2)} .stat-card.c3::before{background:var(--accent3)} .stat-card.c4::before{background:var(--purple)}
+  .stat-val { font-family:'Space Mono'; font-size:26px; font-weight:700; line-height:1; }
+  .stat-lbl { font-size:11px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:1px; }
+  .stat-delta { font-size:11px; margin-top:6px; color:var(--accent); }
+  .streak-card { background:linear-gradient(135deg,#2a1205,#1a0805); border:1px solid rgba(255,100,40,0.3); border-radius:16px; padding:18px; display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+  .streak-num { font-family:'Bebas Neue'; font-size:52px; color:#ff6b35; line-height:1; }
+  .streak-text h3 { color:white; font-size:15px; }
+  .streak-text p { color:rgba(255,255,255,0.55); font-size:12px; margin-top:2px; }
+  .today-box { background:linear-gradient(135deg,#181808,#0e1a08); border:1px solid rgba(232,255,71,0.25); border-radius:16px; padding:20px; margin-bottom:14px; position:relative; overflow:hidden; }
+  .today-box::after { content:''; position:absolute; right:-30px; top:-30px; width:150px; height:150px; background:radial-gradient(circle,rgba(232,255,71,0.07),transparent 70%); border-radius:50%; }
+  .today-tag { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+  .today-name { font-family:'Bebas Neue'; font-size:30px; letter-spacing:2px; }
+  .today-meta { display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; }
+  .today-meta span { font-size:12px; color:var(--muted); }
+  .btn-primary { display:block; width:100%; padding:14px; background:var(--accent); color:var(--bg); border:none; border-radius:12px; font-family:'Bebas Neue'; font-size:19px; letter-spacing:3px; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .btn-primary:active { transform:scale(0.97); }
+  .btn-primary.ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+  .btn-primary.sm { font-size:14px; padding:10px; letter-spacing:2px; }
+  .exercise-item { background:var(--card); border:1px solid var(--border); border-radius:13px; padding:14px; margin-bottom:10px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:border-color 0.2s; }
+  .exercise-item.done { border-color:var(--accent); opacity:0.65; }
+  .exercise-icon { width:44px; height:44px; background:var(--surface2); border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .exercise-info { flex:1; min-width:0; }
+  .exercise-name { font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .exercise-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+  .exercise-check { width:26px; height:26px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; transition:all 0.2s; }
+  .exercise-item.done .exercise-check { background:var(--accent); border-color:var(--accent); color:var(--bg); }
+  .day-tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:18px; scrollbar-width:none; }
+  .day-tabs::-webkit-scrollbar{display:none}
+  .day-tab { flex-shrink:0; padding:8px 16px; border-radius:99px; border:1px solid var(--border); font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); background:var(--card); white-space:nowrap; }
+  .day-tab.active { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+  .add-form { display:none; }
+  .add-form.show { display:flex; flex-direction:column; gap:12px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .f-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+  .f-input { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; width:100%; transition:border-color 0.2s; }
+  .f-input:focus { border-color:var(--accent); }
+  .f-select { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-size:14px; font-family:'DM Sans',sans-serif; outline:none; width:100%; appearance:none; cursor:pointer; }
+  .workout-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:10px; }
+  .workout-card-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; gap:10px; }
+  .workout-card-name { font-family:'Bebas Neue'; font-size:20px; letter-spacing:1px; }
+  .workout-card-day { font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:1.5px; }
+  .workout-card-meta { font-size:12px; color:var(--muted); }
+  .del-workout-btn { background:rgba(255,71,87,0.1); border:1px solid rgba(255,71,87,0.2); border-radius:8px; padding:6px 12px; color:var(--accent2); font-size:12px; cursor:pointer; transition:all 0.2s; white-space:nowrap; flex-shrink:0; }
+  .macro-wrap { margin-bottom:14px; }
+  .macro-row { display:flex; justify-content:space-between; margin-bottom:5px; }
+  .macro-name { font-size:12px; font-weight:600; }
+  .macro-val { font-size:12px; color:var(--muted); }
+  .macro-track { height:7px; background:var(--surface2); border-radius:99px; overflow:hidden; }
+  .macro-fill { height:100%; border-radius:99px; }
+  .cal-circle { width:120px; height:120px; margin:0 auto 18px; position:relative; }
+  .cal-circle svg { transform:rotate(-90deg); }
+  .cal-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .cal-num { font-family:'Space Mono'; font-size:20px; font-weight:700; color:var(--accent); line-height:1; }
+  .cal-lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+  .measure-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  .measure-card { background:var(--card); border:1px solid var(--border); border-radius:13px; padding:13px; text-align:center; }
+  .m-emoji { font-size:22px; margin-bottom:4px; }
+  .m-val { font-family:'Space Mono'; font-size:18px; font-weight:700; color:var(--accent); }
+  .m-lbl { font-size:11px; color:var(--muted); margin-top:2px; }
+  .mini-chart { height:70px; display:flex; align-items:flex-end; gap:6px; }
+  .chart-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .chart-bar { width:100%; background:var(--surface2); border-radius:4px 4px 0 0; position:relative; overflow:hidden; }
+  .chart-fill { position:absolute; bottom:0; left:0; right:0; background:var(--accent); border-radius:4px 4px 0 0; opacity:0.8; }
+  .chart-fill.hi { opacity:1; }
+  .chart-lbl { font-size:9px; color:var(--muted); }
+  .water-grid { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+  .water-cup { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--border); background:var(--card); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; transition:all 0.2s; -webkit-tap-highlight-color:transparent; }
+  .water-cup.on { background:rgba(71,198,255,0.12); border-color:var(--accent3); }
+  .profile-hero { text-align:center; padding:16px 0 24px; }
+  .profile-avatar { width:88px; height:88px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue'; font-size:40px; color:var(--bg); margin:0 auto 12px; border:3px solid rgba(232,255,71,0.25); }
+  .profile-name { font-family:'Bebas Neue'; font-size:28px; letter-spacing:2px; }
+  .profile-tag { display:inline-block; margin-top:6px; background:rgba(232,255,71,0.1); color:var(--accent); font-size:11px; padding:3px 12px; border-radius:99px; letter-spacing:2px; text-transform:uppercase; }
+  .profile-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .pstat { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 8px; text-align:center; }
+  .pstat-val { font-family:'Space Mono'; font-size:18px; font-weight:700; }
+  .pstat-lbl { font-size:10px; color:var(--muted); margin-top:2px; }
+  .notif { position:fixed; top:-60px; left:14px; right:14px; z-index:9000; background:var(--accent); color:var(--bg); border-radius:12px; padding:14px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:10px; transition:top 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 8px 30px rgba(232,255,71,0.3); }
+  .notif.err { background:var(--accent2); box-shadow:0 8px 30px rgba(255,71,87,0.3); }
+  .notif.show { top:14px; }
+  .overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.85); display:none; align-items:flex-end; justify-content:center; }
+  .overlay.open { display:flex; }
+  .sheet { background:var(--surface); border:1px solid var(--border); border-radius:24px 24px 0 0; padding:24px 20px 44px; width:100%; max-width:500px; animation:sheetUp 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .sheet-handle { width:40px; height:4px; background:var(--border); border-radius:99px; margin:0 auto 20px; }
+  .timer-big { font-family:'Space Mono'; font-size:64px; font-weight:700; text-align:center; color:var(--accent); text-shadow:0 0 30px rgba(232,255,71,0.25); letter-spacing:4px; margin:14px 0; }
+  .timer-lbl { text-align:center; color:var(--muted); font-size:11px; letter-spacing:2px; text-transform:uppercase; }
+  .timer-btns { display:flex; gap:10px; margin-top:20px; }
+  .t-btn { flex:1; padding:14px; border:none; border-radius:12px; font-family:'Bebas Neue'; font-size:17px; letter-spacing:2px; cursor:pointer; transition:all 0.2s; }
+  .t-btn.pri{background:var(--accent);color:var(--bg)} .t-btn.sec{background:var(--surface2);color:var(--text)} .t-btn.dan{background:var(--accent2);color:white}
+  .confirm-overlay { position:fixed; inset:0; z-index:600; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; padding:20px; }
+  .confirm-overlay.open { display:flex; }
+  .confirm-box { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px 24px; width:100%; max-width:340px; text-align:center; }
+  .confirm-icon { font-size:40px; margin-bottom:12px; }
+  .confirm-title { font-family:'Bebas Neue'; font-size:24px; letter-spacing:1px; margin-bottom:8px; }
+  .confirm-msg { font-size:14px; color:var(--muted); line-height:1.5; margin-bottom:22px; }
+  .confirm-btns { display:flex; gap:10px; }
+  .c-btn { flex:1; padding:13px; border:none; border-radius:11px; font-family:'Bebas Neue'; font-size:17px; letter-spacing:2px; cursor:pointer; }
+  .c-btn.yes{background:var(--accent2);color:white} .c-btn.no{background:var(--surface2);color:var(--text)}
+  .empty-state { text-align:center; padding:40px 20px; color:var(--muted); }
+  .empty-state .icon { font-size:48px; margin-bottom:12px; }
+  .empty-state p { font-size:14px; line-height:1.6; }
+  ::-webkit-scrollbar { width:0; height:0; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">IRONFIT</div>
+  <div class="splash-sub">Seu Personal Digital</div>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+</div>
+
+<!-- OFFLINE BANNER -->
+<div id="offline-banner">📡 Você está offline — dados locais disponíveis</div>
+
+<!-- UPDATE BANNER -->
+<div id="update-banner">
+  <span>🆕 Nova versão disponível!</span>
+  <button class="update-btn" onclick="applyUpdate()">ATUALIZAR</button>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div class="install-icon">📲</div>
+  <div class="install-text">
+    <div class="install-title">Instalar IRONFIT</div>
+    <div class="install-sub">Acesse mais rápido, funciona offline</div>
+  </div>
+  <div class="install-btns">
+    <button class="install-btn yes" onclick="installApp()">INSTALAR</button>
+    <button class="install-btn no" onclick="dismissInstall()">✕</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"><span id="notif-icon">✅</span><span id="notif-text">OK</span></div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-bg"></div>
+  <div class="auth-grid"></div>
+  <div class="auth-wrap">
+    <div class="auth-logo">IRONFIT</div>
+    <div class="auth-tagline">Seu Personal Digital</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Cadastrar</button>
+    </div>
+    <div class="auth-form">
+      <div class="auth-error" id="auth-error">❌ <span id="auth-error-msg">Erro</span></div>
+      <div class="auth-field">
+        <label class="auth-label">Usuário</label>
+        <input class="auth-input" id="auth-username" type="text" placeholder="seu_usuario" autocomplete="username" autocorrect="off" autocapitalize="none">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Senha</label>
+        <input class="auth-input" id="auth-password" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-register-extras" id="register-extras">
+        <div class="auth-field">
+          <label class="auth-label">Confirmar Senha</label>
+          <input class="auth-input" id="auth-password2" type="password" placeholder="••••••••">
+        </div>
+        <div class="form-row">
+          <div class="auth-field"><label class="auth-label">Altura (m)</label><input class="auth-input" id="reg-height" type="text" placeholder="1.75"></div>
+          <div class="auth-field"><label class="auth-label">Peso (kg)</label><input class="auth-input" id="reg-weight" type="text" placeholder="75"></div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Objetivo</label>
+          <select class="select-field" id="reg-goal">
+            <option value="Hipertrofia">💪 Hipertrofia</option>
+            <option value="Emagrecimento">🔥 Emagrecimento</option>
+            <option value="Definição">✂️ Definição</option>
+            <option value="Condicionamento">🏃 Condicionamento</option>
+            <option value="Força">🏋️ Força</option>
+            <option value="Saúde">❤️ Saúde</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-auth" id="auth-btn" onclick="handleAuth()">ENTRAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">IRONFIT</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="logout-btn" onclick="logout()">Sair</button>
+      <div class="topbar-user">
+        <div class="topbar-names">
+          <div class="topbar-name" id="topbar-username">—</div>
+          <div class="topbar-lvl" id="topbar-level">⭐ NÍVEL 1</div>
+        </div>
+        <div class="avatar" id="topbar-avatar">?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div style="margin:12px 0 16px">
+      <div style="font-size:13px;color:var(--muted)">Bom treino,</div>
+      <div style="font-family:'Bebas Neue';font-size:34px;letter-spacing:2px" id="home-username">USUÁRIO</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-num" id="home-streak">🔥 0</div>
+      <div class="streak-text">
+        <h3 id="streak-label">Comece sua série!</h3>
+        <p id="streak-sub">Faça seu primeiro treino hoje</p>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card c1"><div class="stat-val" id="stat-treinos">0</div><div class="stat-lbl">Treinos Feitos</div><div class="stat-delta">este mês</div></div>
+      <div class="stat-card c2"><div class="stat-val" id="stat-peso">—</div><div class="stat-lbl">Peso Atual</div></div>
+      <div class="stat-card c3"><div class="stat-val" id="stat-workouts">0</div><div class="stat-lbl">Treinos Criados</div></div>
+      <div class="stat-card c4"><div class="stat-val" id="stat-agua">0/8</div><div class="stat-lbl">Água Hoje</div></div>
+    </div>
+    <div class="today-box" id="today-box">
+      <div class="today-tag">🗓 PRÓXIMO TREINO</div>
+      <div class="today-name" id="today-name">Nenhum treino</div>
+      <div class="today-meta" id="today-meta"><span>Crie seu primeiro treino na aba Treino</span></div>
+      <button class="btn-primary" style="margin-top:14px" id="today-btn" onclick="goTo('treino')">VER TREINOS</button>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-title" style="margin:0">💧 Hidratação Diária</div>
+        <div style="font-family:'Space Mono';font-size:18px;color:var(--accent3)" id="water-label">0 / 2L</div>
+      </div>
+      <div class="water-grid" id="water-cups"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Frequência Semanal</div>
+      <div class="mini-chart" id="home-chart"></div>
+    </div>
+  </div>
+
+  <!-- TREINO -->
+  <div class="page" id="page-treino">
+    <div class="sec-title">MEUS TREINOS</div>
+    <div class="sec-sub">Crie, execute e gerencie</div>
+    <div id="workout-list"></div>
+    <button class="btn-primary ghost" style="margin-bottom:14px" onclick="toggleAddForm()" id="add-form-btn">+ CRIAR NOVO TREINO</button>
+    <div class="card add-form" id="add-form">
+      <div class="card-title">➕ Novo Treino</div>
+      <div><div class="f-label">Nome do Treino</div><input class="f-input" id="f-name" placeholder="Ex: Peito e Tríceps"></div>
+      <div class="form-row">
+        <div><div class="f-label">Dia da Semana</div>
+          <select class="f-select" id="f-day">
+            <option>Segunda</option><option>Terça</option><option>Quarta</option>
+            <option>Quinta</option><option>Sexta</option><option>Sábado</option><option>Domingo</option>
+          </select>
+        </div>
+        <div><div class="f-label">Duração (min)</div><input class="f-input" id="f-duration" type="number" placeholder="60"></div>
+      </div>
+      <div><div class="f-label">Exercícios (um por linha)</div>
+        <textarea class="f-input" id="f-exercises" rows="5"
+          placeholder="Supino Reto — 4x10&#10;Crucifixo — 3x12&#10;Tríceps Pulley — 4x12"
+          style="resize:vertical;line-height:1.6"></textarea>
+      </div>
+      <div><div class="f-label">Observações (opcional)</div><input class="f-input" id="f-notes" placeholder="Ex: Foco em contração total"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary sm" style="flex:1" onclick="saveWorkout()">SALVAR TREINO</button>
+        <button class="btn-primary ghost sm" style="flex:1" onclick="toggleAddForm()">CANCELAR</button>
+      </div>
+    </div>
+    <div id="execute-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase">EXECUTANDO</div>
+          <div style="font-family:'Bebas Neue';font-size:24px" id="exec-name">—</div>
+        </div>
+        <button class="btn-primary ghost sm" onclick="closeExecute()" style="width:auto;padding:8px 16px">✕ Fechar</button>
+      </div>
+      <div id="exec-exercises"></div>
+      <button class="btn-primary sm" style="margin-top:8px" onclick="openTimer()">⏱ TIMER DE DESCANSO</button>
+    </div>
+  </div>
+
+  <!-- NUTRIÇÃO -->
+  <div class="page" id="page-nutri">
+    <div class="sec-title">NUTRIÇÃO</div>
+    <div class="sec-sub">Acompanhe seus macros</div>
+    <div class="card">
+      <div class="cal-circle">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="9"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="9" stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"/>
+        </svg>
+        <div class="cal-center"><div class="cal-num">1840</div><div class="cal-lbl">/ 2200 kcal</div></div>
+      </div>
+      <div class="macro-wrap"><div class="macro-row"><span class="macro-name">🥩 Proteína</span><span class="macro-val">142 / 180g</span></div><div class="macro-track"><div class="macro-fill" style="width:79%;background:var(--accent3)"></div></div></div>
+      <div class="macro-wrap"><div class="macro-row"><span class="macro-name">🍞 Carboidrato</span><span class="macro-val">195 / 240g</span></div><div class="macro-track"><div class="macro-fill" style="width:81%;background:var(--accent)"></div></div></div>
+      <div class="macro-wrap"><div class="macro-row"><span class="macro-name">🥑 Gordura</span><span class="macro-val">52 / 70g</span></div><div class="macro-track"><div class="macro-fill" style="width:74%;background:var(--purple)"></div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🍽 Refeições</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><span style="font-size:22px">🌅</span><div style="flex:1"><div style="font-size:14px;font-weight:500">Café da Manhã</div><div style="font-size:12px;color:var(--muted)">Aveia + Whey — 480kcal</div></div><span style="font-size:11px;color:var(--accent);font-family:'Space Mono'">07:30</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><span style="font-size:22px">💪</span><div style="flex:1"><div style="font-size:14px;font-weight:500">Pré-Treino</div><div style="font-size:12px;color:var(--muted)">Frango + Arroz — 560kcal</div></div><span style="font-size:11px;color:var(--accent);font-family:'Space Mono'">11:00</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><span style="font-size:22px">🥤</span><div style="flex:1"><div style="font-size:14px;font-weight:500">Pós-Treino</div><div style="font-size:12px;color:var(--muted)">Whey + Batata Doce — 420kcal</div></div><span style="font-size:11px;color:var(--accent);font-family:'Space Mono'">14:00</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0"><span style="font-size:22px">🌙</span><div style="flex:1"><div style="font-size:14px;font-weight:500">Jantar</div><div style="font-size:12px;color:var(--muted)">Salmão + Legumes — 380kcal</div></div><span style="font-size:11px;color:var(--accent);font-family:'Space Mono'">19:30</span></div>
+      <button class="btn-primary ghost sm" style="margin-top:10px" onclick="showNotif('Em breve: adicionar refeições! 🍽')">+ Adicionar Refeição</button>
+    </div>
+  </div>
+
+  <!-- PROGRESSO -->
+  <div class="page" id="page-progress">
+    <div class="sec-title">PROGRESSO</div>
+    <div class="sec-sub">Seu histórico de evolução</div>
+    <div class="measure-grid">
+      <div class="measure-card"><div class="m-emoji">⚖️</div><div class="m-val" id="p-weight">—</div><div class="m-lbl">Peso Atual</div></div>
+      <div class="measure-card"><div class="m-emoji">📏</div><div class="m-val" id="p-height">—</div><div class="m-lbl">Altura</div></div>
+      <div class="measure-card"><div class="m-emoji">🎯</div><div class="m-val" id="p-goal">—</div><div class="m-lbl">Objetivo</div></div>
+      <div class="measure-card"><div class="m-emoji">💪</div><div class="m-val" id="p-workouts">0</div><div class="m-lbl">Treinos Criados</div></div>
+    </div>
+    <div class="card"><div class="card-title">📊 Treinos por Dia da Semana</div><div class="mini-chart" id="progress-chart"></div></div>
+    <div class="card"><div class="card-title">🎯 Metas</div><div id="goals-list"></div></div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="page" id="page-perfil">
+    <div class="profile-hero">
+      <div class="profile-avatar" id="perf-avatar">?</div>
+      <div class="profile-name" id="perf-name">USUÁRIO</div>
+      <div class="profile-tag">⭐ PLANO FREE</div>
+    </div>
+    <div class="profile-stats">
+      <div class="pstat"><div class="pstat-val" id="ps-workouts">0</div><div class="pstat-lbl">Treinos</div></div>
+      <div class="pstat"><div class="pstat-val" id="ps-streak" style="color:var(--accent2)">0🔥</div><div class="pstat-lbl">Streak</div></div>
+      <div class="pstat"><div class="pstat-val" id="ps-done" style="color:var(--accent)">0</div><div class="pstat-lbl">Concluídos</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Dados Pessoais</div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div><div class="f-label">Peso (kg)</div><input class="f-input" id="edit-weight" type="text" placeholder="75"></div>
+        <div><div class="f-label">Altura (m)</div><input class="f-input" id="edit-height" type="text" placeholder="1.75" readonly></div>
+      </div>
+      <div style="margin-bottom:12px"><div class="f-label">Objetivo</div>
+        <select class="f-select" id="edit-goal">
+          <option>Hipertrofia</option><option>Emagrecimento</option><option>Definição</option>
+          <option>Condicionamento</option><option>Força</option><option>Saúde</option>
+        </select>
+      </div>
+      <button class="btn-primary sm" onclick="saveProfile()">SALVAR ALTERAÇÕES</button>
+    </div>
+    <div class="card">
+      <div class="card-title">⚙️ Conta</div>
+      <div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showNotif('Notificações: em breve! 🔔')"><span style="font-size:20px;width:36px">🔔</span><span style="flex:1;font-size:14px">Notificações</span><span style="color:var(--muted)">›</span></div>
+      <div style="display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="showNotif('Compartilhado! 📤')"><span style="font-size:20px;width:36px">📤</span><span style="flex:1;font-size:14px">Compartilhar Progresso</span><span style="color:var(--muted)">›</span></div>
+      <div style="display:flex;align-items:center;padding:14px 0;cursor:pointer" onclick="logout()"><span style="font-size:20px;width:36px">🚪</span><span style="flex:1;font-size:14px;color:var(--accent2)">Sair da Conta</span><span style="color:var(--muted)">›</span></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-home" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Início
+    </button>
+    <button class="nav-btn" id="nav-treino" onclick="goTo('treino')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6.5 6.5h11M6.5 17.5h11M4 12h16"/></svg>Treino
+    </button>
+    <button class="nav-btn" id="nav-nutri" onclick="goTo('nutri')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Nutrição
+    </button>
+    <button class="nav-btn" id="nav-progress" onclick="goTo('progress')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Progresso
+    </button>
+    <button class="nav-btn" id="nav-perfil" onclick="goTo('perfil')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Perfil
+    </button>
+  </nav>
+</div>
+
+<!-- TIMER -->
+<div class="overlay" id="timer-overlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="timer-lbl">DESCANSO ENTRE SÉRIES</div>
+    <div class="timer-big" id="timer-display">01:30</div>
+    <div class="timer-lbl" id="timer-status">Pronto para iniciar</div>
+    <div class="timer-btns">
+      <button class="t-btn sec" onclick="addTimerTime()">+30s</button>
+      <button class="t-btn pri" id="timer-btn" onclick="toggleTimer()">INICIAR</button>
+      <button class="t-btn dan" onclick="closeTimer()">FECHAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">EXCLUIR TREINO?</div>
+    <div class="confirm-msg" id="confirm-msg">Tem certeza?</div>
+    <div class="confirm-btns">
+      <button class="c-btn no" onclick="closeConfirm()">CANCELAR</button>
+      <button class="c-btn yes" id="confirm-yes">EXCLUIR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════
+   SERVICE WORKER REGISTRATION
+════════════════════════════════ */
+let swReg = null;
+let deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        swReg = reg;
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              document.getElementById('update-banner').classList.add('show');
+            }
+          });
+        });
+      })
+      .catch(err => console.warn('SW error:', err));
+  });
+}
+
+function applyUpdate() {
+  if (swReg && swReg.waiting) {
+    swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  }
+  window.location.reload();
+}
+
+/* PWA INSTALL PROMPT */
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  setTimeout(() => {
+    if (!localStorage.getItem('installDismissed')) {
+      document.getElementById('install-banner').classList.add('show');
+    }
+  }, 4000);
+});
+
+function installApp() {
+  document.getElementById('install-banner').classList.remove('show');
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(r => {
+      if (r.outcome === 'accepted') showNotif('IRONFIT instalado! 🎉');
+      deferredInstallPrompt = null;
+    });
+  }
+}
+
+function dismissInstall() {
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('installDismissed', '1');
+}
+
+/* OFFLINE DETECTION */
+window.addEventListener('online',  () => document.getElementById('offline-banner').classList.remove('show'));
+window.addEventListener('offline', () => document.getElementById('offline-banner').classList.add('show'));
+if (!navigator.onLine) document.getElementById('offline-banner').classList.add('show');
+
+/* ════════════════════════════════
+   DATA LAYER
+════════════════════════════════ */
+const DB_KEY = 'ironfit_users_v2';
+const SESSION_KEY = 'ironfit_session_v2';
+
+function loadDB() { try { return JSON.parse(localStorage.getItem(DB_KEY)||'{}'); } catch { return {}; } }
+function saveDB(db) { try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(e){} }
+function loadSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); } catch { return null; } }
+function saveSession(u) { try { localStorage.setItem(SESSION_KEY, JSON.stringify({username:u})); } catch(e){} }
+function clearSession() { try { localStorage.removeItem(SESSION_KEY); } catch(e){} }
+
+const AVATAR_COLORS = [
+  'linear-gradient(135deg,#e8ff47,#b5cc00)',
+  'linear-gradient(135deg,#ff6b35,#ff4757)',
+  'linear-gradient(135deg,#47c6ff,#0088cc)',
+  'linear-gradient(135deg,#b066ff,#7700cc)',
+  'linear-gradient(135deg,#ff9f43,#ee5a24)',
+  'linear-gradient(135deg,#00d2d3,#009999)',
+];
+function avatarColor(u) { let s=0; for(let c of u) s+=c.charCodeAt(0); return AVATAR_COLORS[s%AVATAR_COLORS.length]; }
+
+let currentUser = null;
+let completedExercises = {};
+let waterCount = 0;
+
+/* ════════════════════════════════
+   SPLASH → AUTO LOGIN or AUTH
+════════════════════════════════ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('out');
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      const sess = loadSession();
+      if (sess?.username) {
+        const db = loadDB();
+        if (db[sess.username]) { loginAs(sess.username, false); return; }
+      }
+      document.getElementById('auth-screen').classList.add('active');
+    }, 600);
+  }, 2200);
+});
+
+/* ════════════════════════════════
+   AUTH
+════════════════════════════════ */
+let authMode = 'login';
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active',(i===0&&mode==='login')||(i===1&&mode==='register')));
+  document.getElementById('register-extras').classList.toggle('show', mode==='register');
+  document.getElementById('auth-btn').textContent = mode==='login' ? 'ENTRAR' : 'CRIAR CONTA';
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function showAuthError(msg) {
+  document.getElementById('auth-error-msg').textContent = msg;
+  document.getElementById('auth-error').classList.add('show');
+}
+
+function handleAuth() {
+  const username = document.getElementById('auth-username').value.trim().toLowerCase();
+  const password = document.getElementById('auth-password').value;
+  if (!username||!password) { showAuthError('Preencha todos os campos.'); return; }
+  if (username.length<3) { showAuthError('Usuário deve ter pelo menos 3 caracteres.'); return; }
+  if (!/^[a-z0-9_]+$/.test(username)) { showAuthError('Usuário: apenas letras, números e _.'); return; }
+  const db = loadDB();
+  if (authMode==='login') {
+    if (!db[username]) { showAuthError('Usuário não encontrado.'); return; }
+    if (db[username].password !== btoa(password)) { showAuthError('Senha incorreta.'); return; }
+    loginAs(username, true);
+    showNotif(`Olá de volta, ${username}! 💪`);
+  } else {
+    const pw2 = document.getElementById('auth-password2').value;
+    if (password.length<6) { showAuthError('Senha deve ter pelo menos 6 caracteres.'); return; }
+    if (password!==pw2) { showAuthError('As senhas não coincidem.'); return; }
+    if (db[username]) { showAuthError('Nome de usuário já em uso.'); return; }
+    db[username] = {
+      password: btoa(password),
+      createdAt: Date.now(),
+      profile: {
+        height: document.getElementById('reg-height').value.trim()||'—',
+        weight: document.getElementById('reg-weight').value.trim()||'—',
+        goal: document.getElementById('reg-goal').value,
+      },
+      workouts: [],
+      stats: { trainingsCompleted:0, streak:0 },
+      water: 0,
+    };
+    saveDB(db);
+    loginAs(username, true);
+    showNotif(`Bem-vindo ao IRONFIT, ${username}! 🎉`);
+  }
+}
+
+function loginAs(username, persist) {
+  currentUser = username;
+  if (persist) saveSession(username);
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('app').classList.add('active');
+  refreshUI(); goTo('home');
+}
+
+function logout() {
+  clearSession(); currentUser = null; completedExercises = {}; waterCount = 0;
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('auth-username').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-password2').value = '';
+  switchAuthTab('login');
+  showNotif('Até logo! 👋');
+}
+
+function getUser() { return loadDB()[currentUser]; }
+function updateUser(fn) { const db=loadDB(); fn(db[currentUser]); saveDB(db); }
+
+/* ════════════════════════════════
+   NAVIGATION
+════════════════════════════════ */
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  if(page==='treino') renderWorkoutList();
+  if(page==='progress') renderProgress();
+  if(page==='perfil') renderPerfil();
+}
+
+/* ════════════════════════════════
+   REFRESH UI
+════════════════════════════════ */
+function refreshUI() {
+  const user = getUser(); if(!user) return;
+  const initials = currentUser.slice(0,2).toUpperCase();
+  document.getElementById('topbar-username').textContent = currentUser;
+  document.getElementById('topbar-avatar').textContent = initials;
+  document.getElementById('topbar-avatar').style.background = avatarColor(currentUser);
+  const level = Math.floor((user.workouts?.length||0)/3)+1;
+  document.getElementById('topbar-level').textContent = `⭐ NÍVEL ${level}`;
+  document.getElementById('home-username').textContent = currentUser.toUpperCase();
+  const streak = user.stats?.streak||0;
+  document.getElementById('home-streak').textContent = `🔥 ${streak}`;
+  document.getElementById('streak-label').textContent = streak>0 ? `${streak} Dias Seguidos!` : 'Comece sua série!';
+  document.getElementById('streak-sub').textContent = streak>0 ? 'Continue assim! Você está arrasando!' : 'Faça seu primeiro treino hoje';
+  document.getElementById('stat-treinos').textContent = user.stats?.trainingsCompleted||0;
+  document.getElementById('stat-peso').textContent = user.profile?.weight ? `${user.profile.weight}kg` : '—';
+  document.getElementById('stat-workouts').textContent = user.workouts?.length||0;
+  waterCount = user.water||0;
+  renderWater();
+  const workouts = user.workouts||[];
+  if (workouts.length>0) {
+    const w = workouts[0];
+    document.getElementById('today-name').textContent = w.name;
+    document.getElementById('today-meta').innerHTML = `<span>📅 ${w.day}</span><span>⏱ ${w.duration||'—'} min</span><span>💪 ${(w.exercises||[]).length} exercícios</span>`;
+    document.getElementById('today-btn').textContent = 'INICIAR TREINO';
+    document.getElementById('today-btn').onclick = () => { goTo('treino'); executeWorkout(w.id); };
+  } else {
+    document.getElementById('today-name').textContent = 'Nenhum treino';
+    document.getElementById('today-meta').innerHTML = '<span>Crie seu primeiro treino na aba Treino</span>';
+    document.getElementById('today-btn').textContent = 'CRIAR TREINO';
+    document.getElementById('today-btn').onclick = () => goTo('treino');
+  }
+  buildHomeChart();
+}
+
+function renderWater() {
+  const cups = document.getElementById('water-cups'); cups.innerHTML='';
+  for(let i=0;i<8;i++){
+    const c=document.createElement('div');
+    c.className='water-cup'+(i<waterCount?' on':'');
+    c.textContent='💧';
+    c.onclick=()=>{waterCount=i+1;updateUser(u=>{u.water=waterCount;});renderWater();document.getElementById('stat-agua').textContent=`${waterCount}/8`;showNotif(`${waterCount} copos! 💧`);};
+    cups.appendChild(c);
+  }
+  document.getElementById('water-label').textContent=`${waterCount*0.25}L / 2L`;
+  document.getElementById('stat-agua').textContent=`${waterCount}/8`;
+}
+
+function buildHomeChart() {
+  const labels=['SEG','TER','QUA','QUI','SEX','SAB','HOJ'];
+  const data=[65,80,30,90,75,55,40];
+  document.getElementById('home-chart').innerHTML=labels.map((l,i)=>`
+    <div class="chart-col"><div class="chart-bar" style="height:60px"><div class="chart-fill ${i===6?'hi':''}" style="height:${data[i]}%"></div></div><div class="chart-lbl">${l}</div></div>
+  `).join('');
+}
+
+/* ════════════════════════════════
+   WORKOUTS
+════════════════════════════════ */
+function renderWorkoutList() {
+  const user=getUser(); const workouts=user?.workouts||[];
+  const list=document.getElementById('workout-list'); closeExecute();
+  if(workouts.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="icon">🏋️</div><p>Você ainda não tem treinos.<br>Crie seu primeiro clicando em<br><strong>"Criar Novo Treino"</strong> abaixo!</p></div>`;
+    return;
+  }
+  list.innerHTML=workouts.map(w=>`
+    <div class="workout-card" id="wcard-${w.id}">
+      <div class="workout-card-header">
+        <div>
+          <div class="workout-card-day">${w.day}</div>
+          <div class="workout-card-name">${w.name}</div>
+          <div class="workout-card-meta">⏱ ${w.duration||'—'} min · 💪 ${(w.exercises||[]).length} exercícios</div>
+          ${w.notes?`<div style="font-size:12px;color:var(--muted);margin-top:4px">📝 ${w.notes}</div>`:''}
+        </div>
+        <button class="del-workout-btn" onclick="confirmDeleteWorkout('${w.id}','${w.name.replace(/'/g,"\\'")}')">🗑️ Excluir</button>
+      </div>
+      <button class="btn-primary sm" onclick="executeWorkout('${w.id}')">▶ INICIAR</button>
+    </div>
+  `).join('');
+}
+
+function toggleAddForm() {
+  const form=document.getElementById('add-form'); const showing=form.classList.contains('show');
+  form.classList.toggle('show',!showing);
+  document.getElementById('add-form-btn').textContent=showing?'+ CRIAR NOVO TREINO':'✕ CANCELAR';
+  if(!showing){form.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('f-name').focus();}
+}
+
+function saveWorkout() {
+  const name=document.getElementById('f-name').value.trim();
+  const day=document.getElementById('f-day').value;
+  const duration=document.getElementById('f-duration').value.trim();
+  const rawEx=document.getElementById('f-exercises').value.trim();
+  const notes=document.getElementById('f-notes').value.trim();
+  if(!name){showNotif('Dê um nome ao treino! 📝',true);return;}
+  if(!rawEx){showNotif('Adicione pelo menos um exercício! 💪',true);return;}
+  const exercises=rawEx.split('\n').map(line=>{const p=line.split('—');return{name:(p[0]||line).trim(),sets:(p[1]||'').trim()||'3x12'};}).filter(e=>e.name);
+  const workout={id:'w_'+Date.now(),name,day,duration,exercises,notes,createdAt:Date.now()};
+  updateUser(u=>{if(!u.workouts)u.workouts=[];u.workouts.unshift(workout);});
+  document.getElementById('f-name').value='';document.getElementById('f-duration').value='';document.getElementById('f-exercises').value='';document.getElementById('f-notes').value='';
+  toggleAddForm(); renderWorkoutList(); refreshUI();
+  showNotif(`Treino "${name}" criado! 💪`);
+}
+
+function confirmDeleteWorkout(id, name) {
+  document.getElementById('confirm-msg').textContent=`Excluir "${name}"? Esta ação não pode ser desfeita.`;
+  document.getElementById('confirm-overlay').classList.add('open');
+  document.getElementById('confirm-yes').onclick=()=>{
+    updateUser(u=>{u.workouts=(u.workouts||[]).filter(w=>w.id!==id);});
+    renderWorkoutList(); refreshUI(); closeConfirm();
+    showNotif(`Treino excluído.`);
+  };
+}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');}
+
+function executeWorkout(id) {
+  const user=getUser(); const w=(user.workouts||[]).find(x=>x.id===id); if(!w) return;
+  document.getElementById('exec-name').textContent=w.name;
+  const icons=['🏋️','💪','🔽','⬆️','🔄','🎯','🦵','🧱','🏃'];
+  document.getElementById('exec-exercises').innerHTML=(w.exercises||[]).map((ex,i)=>{
+    const key=id+'_'+i; const done=completedExercises[key];
+    return `<div class="exercise-item ${done?'done':''}" id="exitem-${key}" onclick="toggleExercise('${id}','${i}')">
+      <div class="exercise-icon">${icons[i%icons.length]}</div>
+      <div class="exercise-info"><div class="exercise-name">${ex.name}</div><div class="exercise-meta">${ex.sets}</div></div>
+      <div class="exercise-check">${done?'✓':''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('execute-section').style.display='block';
+  document.getElementById('execute-section').scrollIntoView({behavior:'smooth'});
+  updateUser(u=>{if(!u.stats)u.stats={};u.stats.trainingsCompleted=(u.stats.trainingsCompleted||0)+1;u.stats.streak=(u.stats.streak||0)+1;});
+  refreshUI();
+}
+function closeExecute(){document.getElementById('execute-section').style.display='none';completedExercises={};}
+function toggleExercise(wid,idx){
+  const key=wid+'_'+idx; completedExercises[key]=!completedExercises[key];
+  const el=document.getElementById('exitem-'+key);
+  el.classList.toggle('done',completedExercises[key]);
+  el.querySelector('.exercise-check').textContent=completedExercises[key]?'✓':'';
+  if(completedExercises[key]) showNotif('Exercício concluído! 💪');
+}
+
+/* ════════════════════════════════
+   PROGRESS & PERFIL
+════════════════════════════════ */
+function renderProgress() {
+  const user=getUser(); const p=user?.profile||{}; const workouts=user?.workouts||[];
+  document.getElementById('p-weight').textContent=p.weight?`${p.weight}kg`:'—';
+  document.getElementById('p-height').textContent=p.height||'—';
+  document.getElementById('p-goal').textContent=(p.goal||'—').split(' ')[0];
+  document.getElementById('p-workouts').textContent=workouts.length;
+  const days=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+  const labels=['SEG','TER','QUA','QUI','SEX','SAB','DOM'];
+  const counts=days.map(d=>workouts.filter(w=>w.day===d).length);
+  const maxCount=Math.max(...counts,1);
+  document.getElementById('progress-chart').innerHTML=labels.map((l,i)=>`
+    <div class="chart-col"><div class="chart-bar" style="height:60px"><div class="chart-fill" style="height:${(counts[i]/maxCount)*100}%"></div></div><div class="chart-lbl">${l}</div></div>
+  `).join('');
+  document.getElementById('goals-list').innerHTML=[
+    {name:'Criar 5 treinos',cur:Math.min(workouts.length,5),total:5,color:'var(--accent)'},
+    {name:'30 dias de streak',cur:user?.stats?.streak||0,total:30,color:'var(--accent2)'},
+    {name:`Objetivo: ${p.goal||'—'}`,cur:30,total:100,color:'var(--accent3)'},
+  ].map(g=>{const pct=Math.round((g.cur/g.total)*100);return`
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:500">${g.name}</span><span style="font-size:12px;color:var(--muted)">${pct}%</span></div>
+      <div style="height:7px;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${g.color};border-radius:99px"></div></div>
+    </div>`;}).join('');
+}
+
+function renderPerfil() {
+  const user=getUser(); const initials=currentUser.slice(0,2).toUpperCase();
+  document.getElementById('perf-avatar').textContent=initials;
+  document.getElementById('perf-avatar').style.background=avatarColor(currentUser);
+  document.getElementById('perf-name').textContent=currentUser.toUpperCase();
+  document.getElementById('ps-workouts').textContent=user?.workouts?.length||0;
+  document.getElementById('ps-streak').textContent=`${user?.stats?.streak||0}🔥`;
+  document.getElementById('ps-done').textContent=user?.stats?.trainingsCompleted||0;
+  document.getElementById('edit-weight').value=user?.profile?.weight||'';
+  document.getElementById('edit-height').value=user?.profile?.height||'';
+  const sel=document.getElementById('edit-goal'); const goal=user?.profile?.goal||'Hipertrofia';
+  for(let o of sel.options){if(o.value===goal){o.selected=true;break;}}
+}
+
+function saveProfile() {
+  updateUser(u=>{if(!u.profile)u.profile={};u.profile.weight=document.getElementById('edit-weight').value.trim();u.profile.goal=document.getElementById('edit-goal').value;});
+  refreshUI(); showNotif('Dados salvos! ✅');
+}
+
+/* ════════════════════════════════
+   TIMER
+════════════════════════════════ */
+let timerSecs=90,timerRunning=false,timerInterval=null;
+function openTimer(){
+  timerSecs=90;timerRunning=false;clearInterval(timerInterval);
+  updateTimerDisplay();
+  document.getElementById('timer-btn').textContent='INICIAR';
+  document.getElementById('timer-status').textContent='Pronto para iniciar';
+  document.getElementById('timer-display').style.color='var(--accent)';
+  document.getElementById('timer-overlay').classList.add('open');
+}
+function closeTimer(){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-overlay').classList.remove('open');}
+function toggleTimer(){
+  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('timer-btn').textContent='CONTINUAR';document.getElementById('timer-status').textContent='Pausado';}
+  else{
+    timerRunning=true;document.getElementById('timer-btn').textContent='PAUSAR';document.getElementById('timer-status').textContent='Descansando...';
+    timerInterval=setInterval(()=>{
+      timerSecs--;
+      if(timerSecs<=0){clearInterval(timerInterval);timerRunning=false;timerSecs=0;document.getElementById('timer-btn').textContent='REINICIAR';document.getElementById('timer-status').textContent='✅ Descanso concluído!';document.getElementById('timer-display').style.color='var(--accent2)';}
+      updateTimerDisplay();
+    },1000);
+  }
+}
+function addTimerTime(){timerSecs+=30;updateTimerDisplay();}
+function updateTimerDisplay(){
+  const m=String(Math.floor(timerSecs/60)).padStart(2,'0');
+  const s=String(timerSecs%60).padStart(2,'0');
+  document.getElementById('timer-display').textContent=`${m}:${s}`;
+}
+
+/* NOTIFICATIONS */
+let notifTO=null;
+function showNotif(msg,isErr=false){
+  clearTimeout(notifTO);
+  const el=document.getElementById('notif');
+  document.getElementById('notif-icon').textContent=isErr?'❌':'✅';
+  document.getElementById('notif-text').textContent=msg;
+  el.classList.toggle('err',isErr); el.classList.add('show');
+  notifTO=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+/* CLOSE ON BACKDROP */
+document.getElementById('timer-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTimer();});
+document.getElementById('confirm-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeConfirm();});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('auth-screen').classList.contains('active'))handleAuth();});
+</script>
+</body>
+</html>
